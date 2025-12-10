@@ -18,7 +18,7 @@ function App() {
   // 2. Fetch Data from your Backend
   const fetchUnits = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/units');
+      const res = await axios.get('https://lifeline-backend-q03a.onrender.com');
       setUnits(res.data);
     } catch (err) {
       console.error("Error connecting to backend", err);
