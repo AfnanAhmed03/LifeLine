@@ -3,10 +3,10 @@ import axios from 'axios';
 
 interface Drone {
   id: number;
-  hospital_name: string; // This is actually "Base Name"
-  ward_name: string;     // This is actually "Drone Name"
-  total_beds: number;    // Capacity
-  occupied_beds: number; // Used Load
+  hospital_name: string;
+  ward_name: string;
+  total_beds: number;
+  occupied_beds: number;
 }
 
 function App() {
@@ -14,41 +14,54 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string>('');
 
-  // USE YOUR RENDER URL HERE
-  const API_URL = 'https://lifeline-backend.onrender.com'; 
-  // OR use 'http://localhost:5000' if running locally
+  // --- HARDCODED URL FIX ---
+  // We use the full link directly. No variables.
+  const FULL_API_URL = "https://lifeline-backend-q03a.onrender.com/api/units";
+  const BOOK_API_URL = "https://lifeline-backend-q03a.onrender.com/api/book";
 
   const fetchDrones = async () => {
     try {
-      // CORRECT
-      const res = await axios.get(`${API_URL}/api/units`);
+      console.log("Fetching from:", FULL_API_URL); // Debug log
+      const res = await axios.get(FULL_API_URL);
+      console.log("Data received:", res.data); // Debug log
       setDrones(res.data);
     } catch (err) {
-      console.error("Connection Error", err);
+      console.error("Connection Error:", err);
     }
   };
 
   useEffect(() => {
     fetchDrones();
-    const interval = setInterval(fetchDrones, 2000); // Live radar updates
+    const interval = setInterval(fetchDrones, 2000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleLaunch = async (droneId: number) => {
+const handleLaunch = async (droneId: number) => {
     setLoading(true);
     setStatusMsg('INITIATING LAUNCH SEQUENCE...');
 
     try {
-      await axios.post(`${API_URL}/api/book`, {
-        unitId: droneId,
-        patientName: `Mission-${Math.floor(Math.random() * 9999)}`, // Mission ID
+      // DEBUG: Log exactly where we are sending data
+      console.log(`Attempting POST to: ${BOOK_API_URL}`);
+
+      // "Universal Payload" - sends both old and new field names
+      const payload = {
+        unitId: droneId,       // For new "SkyLift" backend
+        slotId: droneId,       // For old "Ticket Booking" backend
+        patientName: `Mission-${Math.floor(Math.random() * 9999)}`, // For Hospital backend
+        userName: `Mission-${Math.floor(Math.random() * 9999)}`,    // For Ticket backend
         severity: 'URGENT'
-      });
+      };
+
+      await axios.post(BOOK_API_URL, payload);
 
       setStatusMsg('🚀 LAUNCH CONFIRMED');
-      fetchDrones();
+      fetchDrones(); // Refresh the list
     } catch (error: any) {
-      setStatusMsg(`⚠️ LAUNCH ABORTED: ${error.response?.data?.message || 'Error'}`);
+      console.error("Launch Error Details:", error); // Check Console if this fails
+      // Show the exact error message from the server
+      const serverMessage = error.response?.data?.message || error.response?.data?.error || 'Unknown Error';
+      setStatusMsg(`⚠️ LAUNCH ABORTED: ${serverMessage}`);
     } finally {
       setLoading(false);
       setTimeout(() => setStatusMsg(''), 3000);
@@ -66,6 +79,13 @@ function App() {
           {statusMsg}
         </div>
       </div>
+
+      {drones.length === 0 && (
+        <div style={{color: 'white', marginTop: '50px', border: '1px solid red', padding: '20px'}}>
+           ⚠️ RADAR OFFLINE (No Data Found). <br/>
+           Check Network Tab in Console.
+        </div>
+      )}
 
       <div className="stats-container">
         {drones.map((drone) => {
