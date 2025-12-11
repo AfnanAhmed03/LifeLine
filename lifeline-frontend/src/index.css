@@ -1,75 +1,135 @@
 :root {
-  --primary: #0ea5e9; /* Medical Blue */
-  --danger: #ef4444;  /* Emergency Red */
-  --success: #22c55e; /* Safe Green */
-  --bg: #f8fafc;
-  --card: #ffffff;
+  --neon-green: #0f0;
+  --dark-bg: #0a0a0a;
+  --panel-bg: #111;
+  --alert: #ff003c;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: var(--bg);
-  color: #334155;
+  font-family: 'Courier New', monospace; /* Monospace looks like code/military */
+  background-color: var(--dark-bg);
+  color: var(--neon-green);
   margin: 0;
   padding: 20px;
+  background-image: 
+    linear-gradient(rgba(0, 20, 0, 0.9), rgba(0, 20, 0, 0.9)),
+    url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+}
+
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  border-bottom: 2px solid var(--neon-green);
+  display: inline-block;
+  padding-bottom: 10px;
+  text-shadow: 0 0 10px var(--neon-green);
 }
 
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
 }
 
 .unit-card {
-  background: var(--card);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  border-left: 5px solid var(--primary);
-  transition: transform 0.2s;
+  background: var(--panel-bg);
+  border: 1px solid #333;
+  border-left: 5px solid var(--neon-green);
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+}
+
+.unit-card::before {
+  content: "ONLINE";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  color: var(--neon-green);
+  border: 1px solid var(--neon-green);
+  padding: 2px 5px;
 }
 
 .unit-card.critical {
-  border-left-color: var(--danger);
+  border-left-color: var(--alert);
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);
 }
 
+.unit-card.critical::before {
+  content: "MAX LOAD";
+  color: var(--alert);
+  border-color: var(--alert);
+}
+
+h3 { margin: 0 0 5px 0; font-size: 1.4rem; }
+p { color: #888; margin: 0; font-size: 0.9rem; }
+
 .progress-bar {
-  background: #e2e8f0;
-  height: 10px;
-  border-radius: 5px;
-  margin: 15px 0;
-  overflow: hidden;
+  background: #222;
+  height: 20px;
+  border: 1px solid #444;
+  margin: 20px 0;
+  position: relative;
 }
 
 .fill {
   height: 100%;
-  background: var(--primary);
-  transition: width 0.5s ease;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--neon-green),
+    var(--neon-green) 10px,
+    #004400 10px,
+    #004400 20px
+  );
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--neon-green);
+}
+
+.unit-card.critical .fill {
+  background: var(--alert);
+  box-shadow: 0 0 10px var(--alert);
 }
 
 .btn {
   width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
+  padding: 15px;
+  background: transparent;
+  border: 2px solid var(--neon-green);
+  color: var(--neon-green);
+  font-family: 'Courier New', monospace;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
-  background-color: var(--primary);
-  color: white;
+  text-transform: uppercase;
+  transition: 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--neon-green);
+  color: black;
+  box-shadow: 0 0 20px var(--neon-green);
 }
 
 .btn:disabled {
-  background-color: #cbd5e1;
+  border-color: #555;
+  color: #555;
   cursor: not-allowed;
 }
 
 .btn.danger {
-  background-color: var(--danger);
+  border-color: var(--alert);
+  color: var(--alert);
+}
+
+.status-msg {
+  font-size: 1.2rem;
+  text-shadow: 0 0 5px currentColor;
 }
